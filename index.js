@@ -20,15 +20,26 @@ const client = new MongoClient(uri, {
 });
 
 async function run() {
+  try {
+    const AvailableCollection = client.db('PetHouse').collection('AvaiablePets');
+    // Get all data from taskCollection
+    app.get('/avaiable-pets', async (req, res) => {
+      const cursor = AvailableCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
 
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+  }
 }
 run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-  res.send('PetHouse server is running');
+  res.send('Task Management server is running');
 });
 
 app.listen(port, () => {
-  console.log(`PetHouse server is running on port ${port}`);
+  console.log(`Task Management server is running on port ${port}`);
 });
