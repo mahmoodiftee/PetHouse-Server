@@ -22,9 +22,16 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const AvailableCollection = client.db('PetHouse').collection('AvaiablePets');
+    const BlogsCollection = client.db('PetHouse').collection('Blogs');
     // Get all data from taskCollection
     app.get('/avaiable-pets', async (req, res) => {
       const cursor = AvailableCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+    // Get all data from taskCollection
+    app.get('/blogs', async (req, res) => {
+      const cursor = BlogsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
