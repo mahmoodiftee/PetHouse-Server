@@ -23,7 +23,7 @@ async function run() {
   try {
     const AvailableCollection = client.db('PetHouse').collection('AvaiablePets');
     const BlogsCollection = client.db('PetHouse').collection('Blogs');
-   
+
     // insert blog in the taskCollection
     app.post('/blogs', async (req, res) => {
       const blog = req.body;
@@ -38,13 +38,26 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     })
-    
+
     // Get all data from taskCollection
     app.get('/blogs', async (req, res) => {
       const cursor = BlogsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
+    // delete
+    app.delete('/blogs/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        console.log(id);
+        const query = { _id: new ObjectId(id) };
+        const result = await BlogsCollection.deleteOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error('Error deleting the task:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+      }
+    });
 
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
