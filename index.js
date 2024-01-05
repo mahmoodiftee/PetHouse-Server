@@ -23,12 +23,22 @@ async function run() {
   try {
     const AvailableCollection = client.db('PetHouse').collection('AvaiablePets');
     const BlogsCollection = client.db('PetHouse').collection('Blogs');
+   
+    // insert blog in the taskCollection
+    app.post('/blogs', async (req, res) => {
+      const blog = req.body;
+      console.log(blog);
+      const result = await BlogsCollection.insertOne(blog);
+      res.send(result);
+    })
+
     // Get all data from taskCollection
     app.get('/avaiable-pets', async (req, res) => {
       const cursor = AvailableCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
+    
     // Get all data from taskCollection
     app.get('/blogs', async (req, res) => {
       const cursor = BlogsCollection.find();
