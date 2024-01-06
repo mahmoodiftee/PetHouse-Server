@@ -61,18 +61,20 @@ async function run() {
 
     //Update endpoints
 
-    // Update a specific field in blog post
+    // Update a specific field in the blog post
     app.patch('/blogs/:id', async (req, res) => {
       try {
         const postID = req.params.id;
         const updatedData = req.body;
-
         const query = { _id: new ObjectId(postID) };
         const update = { $set: updatedData };
 
         const result = await BlogsCollection.updateOne(query, update);
 
         if (result.modifiedCount > 0) {
+          const updatedDocument = await BlogsCollection.findOne(query);
+          console.log('Updated Blog Post:', updatedDocument);
+
           res.status(200).json({ message: 'Blog post updated successfully', modifiedCount: result.modifiedCount });
         } else {
           res.status(404).json({ error: 'Blog post not found' });
@@ -82,6 +84,7 @@ async function run() {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
+
 
 
 
