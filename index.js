@@ -23,29 +23,49 @@ async function run() {
   try {
     const AvailableCollection = client.db('PetHouse').collection('AvaiablePets');
     const BlogsCollection = client.db('PetHouse').collection('Blogs');
+    const BookmarkCollection = client.db('PetHouse').collection('Bookmarks');
 
-    // insert blog in the taskCollection
+    //POST
+    // insert blog in the BlogsCollection
     app.post('/blogs', async (req, res) => {
       const blog = req.body;
       console.log(blog);
       const result = await BlogsCollection.insertOne(blog);
       res.send(result);
     })
+    // insert POST in the BookmarkCollection
+    app.post('/bookmarks', async (req, res) => {
+      try {
+        const bookmark = req.body;
+        const result = await BookmarkCollection.insertOne(bookmark);
+        res.status(201).json({ success: true, message: 'Bookmark added successfully', insertedId: result.insertedId });
+      } catch (error) {
+        console.error('Error adding bookmark:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+      }
+    });
 
-    // Get all data from taskCollection
+
+
+    //GET
+
+    // Get all data from BlogsCollection
     app.get('/avaiable-pets', async (req, res) => {
       const cursor = AvailableCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
 
-    // Get all data from taskCollection
+    // Get all data from BlogsCollection
     app.get('/blogs', async (req, res) => {
       const cursor = BlogsCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
-    // delete
+
+
+    //DELETE
+    // delete post from BlogsCollection
     app.delete('/blogs/:id', async (req, res) => {
       try {
         const id = req.params.id;
@@ -59,8 +79,8 @@ async function run() {
       }
     });
 
-    //Update endpoints
 
+    //UPDATE
     // Update a specific field in the blog post
     app.patch('/blogs/:id', async (req, res) => {
       try {
@@ -84,8 +104,6 @@ async function run() {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
-
-
 
 
 
