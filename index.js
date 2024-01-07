@@ -48,7 +48,6 @@ async function run() {
 
 
     //GET
-
     // Get all data from BlogsCollection
     app.get('/avaiable-pets', async (req, res) => {
       const cursor = AvailableCollection.find();
@@ -62,9 +61,18 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     })
+    // Get all data from BlogsCollection
+    app.get('/bookmarks', async (req, res) => {
+      const cursor = BookmarkCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+
 
 
     //DELETE
+
     // delete post from BlogsCollection
     app.delete('/blogs/:id', async (req, res) => {
       try {
@@ -76,6 +84,24 @@ async function run() {
       } catch (error) {
         console.error('Error deleting the task:', error);
         res.status(500).send({ error: 'Internal Server Error' });
+      }
+    });
+
+
+    // Remove a bookmark for a specific user and post
+    app.delete('/bookmarks/:postId/:userEmail', async (req, res) => {
+      try {
+        const { postId, userEmail } = req.params;
+        // Find and delete the bookmark where postId and BookmarkerEmail match
+        const result = await BookmarkCollection.deleteOne({ postId, BookmarkerEmail: userEmail });
+        if (result.deletedCount > 0) {
+          res.json({ success: true, message: 'Bookmark removed successfully' });
+        } else {
+          res.status(404).json({ success: false, message: 'Bookmark not found' });
+        }
+      } catch (error) {
+        console.error('Error removing bookmark:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
       }
     });
 
