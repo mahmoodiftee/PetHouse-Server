@@ -68,6 +68,23 @@ async function run() {
       res.send(result);
     })
 
+    // bookmarks that matches email with user email
+    // app.get('/bookmarks', async (req, res) => {
+    //   try {
+    //     const userEmail = req.query.BookmarkerEmail;
+    //     console.log('User Email:', userEmail);
+        
+    //     const cursor = BookmarkCollection.find({ BookmarkerEmail: userEmail });
+    //     const bookmarks = await cursor.toArray();
+    //     console.log('Fetched Bookmarks:', bookmarks);
+        
+    //     res.json(bookmarks);
+    //   } catch (error) {
+    //     console.error('Error fetching bookmarks:', error);
+    //     res.status(500).json({ success: false, message: 'Internal Server Error' });
+    //   }
+    // });
+    
 
 
 
@@ -107,6 +124,7 @@ async function run() {
 
 
     //UPDATE & PATCH
+
     // Update a specific field in the blog post
     app.patch('/blogs/:id', async (req, res) => {
       try {
