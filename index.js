@@ -106,7 +106,7 @@ async function run() {
     });
 
 
-    //UPDATE
+    //UPDATE & PATCH
     // Update a specific field in the blog post
     app.patch('/blogs/:id', async (req, res) => {
       try {
@@ -126,6 +126,29 @@ async function run() {
           res.status(404).json({ error: 'Blog post not found' });
         }
       } catch (error) {
+        console.error('Error updating blog post:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
+    //updating reactCount
+    app.patch('/blogs/react/:id', async (req, res) => {
+      try {
+        const postID = req.params.id;
+        const query = { _id: new ObjectId(postID) };
+        const blogPost = await BlogsCollection.findOne(query);
+        if (!blogPost) {
+          return res.status(404).json({ success: false, message: 'Blog not found' });
+        }
+        // Check if the blog has the reactCount field
+        if (!blogPost.reactCount) {
+          blogPost.reactCount = 1; // Set to 1 if the field doesn't exist
+        } else {
+          blogPost.reactCount += 1; // Increment by 1 if the field exists
+        }
+        await blogPost.save();
+        res.json({ success: true, message: 'React count updated successfully', reactCount: blogPost.reactCount });
+      }
+      catch (error) {
         console.error('Error updating blog post:', error);
         res.status(500).json({ error: 'Internal Server Error' });
       }
