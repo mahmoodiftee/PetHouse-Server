@@ -24,8 +24,17 @@ async function run() {
     const AvailableCollection = client.db('PetHouse').collection('AvaiablePets');
     const BlogsCollection = client.db('PetHouse').collection('Blogs');
     const BookmarkCollection = client.db('PetHouse').collection('Bookmarks');
+    const AdoptedCollection = client.db('PetHouse').collection('Adopted');
 
     //POST
+
+    //insert data in the AdoptedCollection
+    app.post('/adoptions', async (req, res) => {
+      const AdoptedPost = req.body;
+      const result = await AdoptedCollection.insertOne(AdoptedPost);
+      res.send(result);
+    })
+
     // insert blog in the BlogsCollection
     app.post('/blogs', async (req, res) => {
       const blog = req.body;
@@ -33,6 +42,7 @@ async function run() {
       const result = await BlogsCollection.insertOne(blog);
       res.send(result);
     })
+
     // insert POST in the BookmarkCollection
     app.post('/bookmarks', async (req, res) => {
       try {
@@ -48,6 +58,13 @@ async function run() {
 
 
     //GET
+    // Get all data from AdoptedCollection
+    app.get('/adoptions', async (req, res) => {
+      const cursor = AdoptedCollection.find();
+      const result = cursor.toArray();
+      res.send(result);
+    })
+
     // Get all data from BlogsCollection
     app.get('/avaiable-pets', async (req, res) => {
       const cursor = AvailableCollection.find();
@@ -73,18 +90,18 @@ async function run() {
     //   try {
     //     const userEmail = req.query.BookmarkerEmail;
     //     console.log('User Email:', userEmail);
-        
+
     //     const cursor = BookmarkCollection.find({ BookmarkerEmail: userEmail });
     //     const bookmarks = await cursor.toArray();
     //     console.log('Fetched Bookmarks:', bookmarks);
-        
+
     //     res.json(bookmarks);
     //   } catch (error) {
     //     console.error('Error fetching bookmarks:', error);
     //     res.status(500).json({ success: false, message: 'Internal Server Error' });
     //   }
     // });
-    
+
 
 
 
