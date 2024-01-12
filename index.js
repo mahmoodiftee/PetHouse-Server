@@ -31,9 +31,20 @@ async function run() {
     //insert data in the AdoptedCollection
     app.post('/adoptions', async (req, res) => {
       const AdoptedPost = req.body;
-      const result = await AdoptedCollection.insertOne(AdoptedPost);
-      res.send(result);
-    })
+      try {
+        const existingPost = await AdoptedCollection.findOne({ _id: AdoptedPost._id });
+        if (existingPost) {
+          res.status(200).send({ error: 'You have already adopted this post.' });
+        } else {
+          const result = await AdoptedCollection.insertOne(AdoptedPost);
+          res.status(200).send(result);
+        }
+      } catch (error) {
+        res.status(500).send('Internal Server Error');
+      }
+    });
+    
+    
 
     // insert blog in the BlogsCollection
     app.post('/blogs', async (req, res) => {
@@ -61,9 +72,10 @@ async function run() {
     // Get all data from AdoptedCollection
     app.get('/adoptions', async (req, res) => {
       const cursor = AdoptedCollection.find();
-      const result = cursor.toArray();
+      const result = await cursor.toArray();
       res.send(result);
-    })
+    });
+
 
     // Get single data from AdoptedCollection by id
     app.get('/adoptions/:id', async (req, res) => {
@@ -73,10 +85,18 @@ async function run() {
       res.send(result);
     })
 
-    // Get all data from BlogsCollection
+    // Get all data from AvailableCollection
     app.get('/avaiable-pets', async (req, res) => {
       const cursor = AvailableCollection.find();
       const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    //Get single data from AvailableCollection
+    app.get('/avaiable-pets/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await AvailableCollection.findOne(query)
       res.send(result);
     })
 
