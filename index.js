@@ -65,6 +65,14 @@ async function run() {
       res.send(result);
     })
 
+    // Get single data from AdoptedCollection by id
+    app.get('/adoptions/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = AdoptedCollection.findOne(query)
+      res.send(result);
+    })
+
     // Get all data from BlogsCollection
     app.get('/avaiable-pets', async (req, res) => {
       const cursor = AvailableCollection.find();
