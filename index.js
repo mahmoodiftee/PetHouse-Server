@@ -27,6 +27,13 @@ async function run() {
     const AdoptedCollection = client.db('PetHouse').collection('Adopted');
 
     //POST
+    //insert data in the AvailableCollection
+    app.post('/avaiable-pets', async (req, res) => {
+      const post = req.body;
+      console.log(post);
+      const result = await AvailableCollection.insertOne(post);
+      res.send(result);
+    })
 
     //insert data in the AdoptedCollection
     app.post('/adoptions', async (req, res) => {
@@ -43,9 +50,6 @@ async function run() {
         res.status(500).send('Internal Server Error');
       }
     });
-    
-    
-
     // insert blog in the BlogsCollection
     app.post('/blogs', async (req, res) => {
       const blog = req.body;
@@ -136,6 +140,21 @@ async function run() {
     //DELETE
 
     // delete post from BlogsCollection
+    app.delete('/avaiable-pets/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        console.log(id);
+        const query = { _id: new ObjectId(id) };
+        const result = await AvailableCollection.deleteOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error('Error deleting the task:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+      }
+    });
+
+
+    // delete post from AvailableCollection
     app.delete('/blogs/:id', async (req, res) => {
       try {
         const id = req.params.id;
