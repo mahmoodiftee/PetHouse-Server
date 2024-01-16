@@ -27,6 +27,7 @@ async function run() {
     const AdoptedCollection = client.db('PetHouse').collection('Adopted');
 
     //POST
+
     //insert data in the AvailableCollection
     app.post('/avaiable-pets', async (req, res) => {
       const post = req.body;
@@ -69,7 +70,6 @@ async function run() {
         res.status(500).json({ success: false, message: 'Internal Server Error' });
       }
     });
-
 
 
     //GET
@@ -142,9 +142,6 @@ async function run() {
     //   }
     // });
 
-
-
-
     //DELETE
 
     // delete post from BlogsCollection
@@ -161,7 +158,6 @@ async function run() {
       }
     });
 
-
     // delete post from AvailableCollection
     app.delete('/blogs/:id', async (req, res) => {
       try {
@@ -175,7 +171,6 @@ async function run() {
         res.status(500).send({ error: 'Internal Server Error' });
       }
     });
-
 
     // Remove a bookmark for a specific user and post
     app.delete('/bookmarks/:postId/:userEmail', async (req, res) => {
@@ -266,8 +261,6 @@ async function run() {
       }
     });
 
-
-
     // Update data in the AvailableCollection
     app.patch('/avaiable-pets/:id', async (req, res) => {
       try {
@@ -291,7 +284,6 @@ async function run() {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
-
 
 
 
