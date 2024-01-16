@@ -268,6 +268,33 @@ async function run() {
 
 
 
+    // Update data in the AvailableCollection
+    app.patch('/avaiable-pets/:id', async (req, res) => {
+      try {
+        const postID = req.params.id;
+        const updatedData = req.body;
+        const query = { _id: new ObjectId(postID) };
+        const update = { $set: updatedData };
+
+        const result = await AvailableCollection.updateOne(query, update);
+
+        if (result.modifiedCount > 0) {
+          const updatedDocument = await AvailableCollection.findOne(query);
+          console.log('Updated Adoption Post:', updatedDocument);
+
+          res.status(200).json({ message: 'Adoption post updated successfully', modifiedCount: result.modifiedCount });
+        } else {
+          res.status(404).json({ error: 'Adoption post not found' });
+        }
+      } catch (error) {
+        console.error('Error updating adoption post:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
+
+
+
+
 
 
 
