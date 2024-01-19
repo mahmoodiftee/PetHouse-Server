@@ -45,12 +45,15 @@ async function run() {
           res.status(200).send({ error: 'You have already adopted this post.' });
         } else {
           const result = await AdoptedCollection.insertOne(AdoptedPost);
-          res.status(200).send(result);
+          res.status(200).json({ success: true, message: 'Adopted Successfully', insertedId: result.insertedId });
         }
       } catch (error) {
         res.status(500).send('Internal Server Error');
       }
     });
+
+
+
     // insert blog in the BlogsCollection
     app.post('/blogs', async (req, res) => {
       const blog = req.body;
@@ -90,7 +93,7 @@ async function run() {
       console.log(result);
       res.send(result);
     });
-  
+
 
     // Get all data from AvailableCollection
     app.get('/avaiable-pets', async (req, res) => {
@@ -264,29 +267,54 @@ async function run() {
       }
     });
 
-    // Update data in the AvailableCollection
-    app.patch('/avaiable-pets/:id', async (req, res) => {
+    // Status Change on adoption post
+    app.patch('/available-pets/:id', async (req, res) => {
       try {
-        const postID = req.params.id;
-        const updatedData = req.body;
-        const query = { _id: new ObjectId(postID) };
-        const update = { $set: updatedData };
+        const postId = req.params.id;
+        const newStatus = req.body.status;
+
+        const query = { _id: new ObjectId(postId) };
+        const update = { $set: { status: newStatus } };
 
         const result = await AvailableCollection.updateOne(query, update);
 
         if (result.modifiedCount > 0) {
           const updatedDocument = await AvailableCollection.findOne(query);
           console.log('Updated Adoption Post:', updatedDocument);
-
-          res.status(200).json({ message: 'Adoption post updated successfully', modifiedCount: result.modifiedCount });
+          res.status(200).json({ message: 'Adoption post status updated successfully', modifiedCount: result.modifiedCount });
         } else {
           res.status(404).json({ error: 'Adoption post not found' });
         }
       } catch (error) {
-        console.error('Error updating adoption post:', error);
+        console.error('Error updating adoption post status:', error);
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
+
+
+
+
+    // Update data in the AvailableCollection
+    app.patch('/avaiable-pets/:id', async (req, res) => {
+      try {
+        const postId = req.params.id;
+        const newStatus = req.body.status;
+        const query = { _id: new ObjectId(postId) };
+        const update = { $set: { status: newStatus } };
+        const result = await AvailableCollection.updateOne(query, update);
+        if (result.modifiedCount > 0) {
+          const updatedDocument = await AvailableCollection.findOne(query);
+          console.log('Updated Adoption Post:', updatedDocument);
+          res.status(200).json({ message: 'Available adoption post status updated successfully', modifiedCount: result.modifiedCount });
+        } else {
+          res.status(404).json({ error: 'Available adoption post not found' });
+        }
+      } catch (error) {
+        console.error('Error updating available adoption post status:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    });
+
 
 
 
