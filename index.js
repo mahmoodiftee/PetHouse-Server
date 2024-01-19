@@ -37,7 +37,7 @@ async function run() {
     })
 
     //insert data in the AdoptedCollection
-    app.post('/adoptions', async (req, res) => {
+    app.post('/adopted', async (req, res) => {
       const AdoptedPost = req.body;
       try {
         const existingPost = await AdoptedCollection.findOne({ _id: AdoptedPost._id });
@@ -74,7 +74,7 @@ async function run() {
 
     //GET
     // Get all data from AdoptedCollection
-    app.get('/adoptions', async (req, res) => {
+    app.get('/adopted', async (req, res) => {
       const cursor = AdoptedCollection.find();
       const result = await cursor.toArray();
       res.send(result);
@@ -82,12 +82,15 @@ async function run() {
 
 
     // Get single data from AdoptedCollection by id
-    app.get('/adoptions/:id', async (req, res) => {
+    app.get('/adopted/:id', async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) }
-      const result = AdoptedCollection.findOne(query)
+      console.log(id);
+      const query = { _id: new ObjectId(id) };
+      const result = await AdoptedCollection.findOne(query);
+      console.log(result);
       res.send(result);
-    })
+    });
+  
 
     // Get all data from AvailableCollection
     app.get('/avaiable-pets', async (req, res) => {
