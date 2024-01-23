@@ -211,7 +211,7 @@ async function run() {
       try {
         const id = req.params.id;
         console.log(id);
-        const query = { _id: new ObjectId(id) };
+        const query = { _id: id };
         const result = await AdoptedCollection.deleteOne(query);
         res.send(result);
       } catch (error) {
@@ -370,13 +370,14 @@ async function run() {
       }
     });
 
-    // Update data in the AvailableCollection
+    // Update data in the AdoptedCollection
     app.patch('/adopted/:id', async (req, res) => {
       try {
         const postId = req.params.id;
         const newStatus = req.body.status;
+        const newPresentStatus = req.body.presentStatus || newStatus;
         const query = { _id: postId };
-        const update = { $set: { status: newStatus } };
+        const update = { $set: { status: newStatus, presentStatus: newPresentStatus } };
         const result = await AdoptedCollection.updateOne(query, update);
 
         if (result.modifiedCount > 0) {
@@ -388,6 +389,7 @@ async function run() {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
+
 
 
 
