@@ -370,26 +370,25 @@ async function run() {
       }
     });
 
-    // Update data in the AdoptedCollection
+    // Update data in the AvailableCollection
     app.patch('/adopted/:id', async (req, res) => {
       try {
         const postId = req.params.id;
         const newStatus = req.body.status;
-        const query = { _id: new ObjectId(postId) };
+        const query = { _id: postId };
         const update = { $set: { status: newStatus } };
         const result = await AdoptedCollection.updateOne(query, update);
+
         if (result.modifiedCount > 0) {
-          const updatedDocument = await AdoptedCollection.findOne(query);
-          console.log('Updated Adopted Post:', updatedDocument);
           res.status(200).json({ message: 'status updated successfully', modifiedCount: result.modifiedCount });
         } else {
           res.status(404).json({ error: 'not found' });
         }
       } catch (error) {
-        console.error('Error updating status:', error);
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
+
 
 
 
