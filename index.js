@@ -4,11 +4,32 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 const app = express();
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser')
 
 //middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json());
+app.use(cookieParser());
 
+// varify the access token
+const verifyToken = async (req, res, next) => {
+  const token = req?.cookies?.token;
+  console.log("toker", token);
+  if (!token) {
+    return res.status(401).send({ message: "unauthorized access 401" })
+  }
+  jwt.verify(token, process.env.ACCESS_USER_TOKEN, (error, decoded) => {
+    if (error) {
+      return res.status(401).send({ message: "unauthorized access" })
+    }
+    req.user = decoded;
+    next();
+  })
+}
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fc0zsls.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -27,6 +48,30 @@ async function run() {
     const AdoptedCollection = client.db('PetHouse').collection('Adopted');
 
     //POST
+    // json werb token api 
+    app.post('/jwt', async (req, res) => {
+      const user = req.body;
+      console.log("user in  post api ", user);
+      const token = jwt.sign(user, process.env.ACCESS_USER_TOKEN, { expiresIn: "1h" })
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production" ? true : false,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+
+      })
+        .send({ success: true })
+    })
+
+    try {
+      app.post('/logout', (req, res) => {
+        const user = req.body;
+        console.log('Logged Out ', user)
+        res.clearCookie('token', { maxAge: 0 },).send({ success: true })
+      })
+    } catch (error) {
+      console.log(error);
+    }
+
 
     //insert data in the AvailableCollection
     app.post('/avaiable-pets', async (req, res) => {
@@ -52,8 +97,6 @@ async function run() {
       }
     });
 
-
-
     // insert blog in the BlogsCollection
     app.post('/blogs', async (req, res) => {
       const blog = req.body;
@@ -76,13 +119,13 @@ async function run() {
 
 
     //GET
+
     // Get all data from AdoptedCollection
     app.get('/adopted', async (req, res) => {
       const cursor = AdoptedCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
-
 
     // Get single data from AdoptedCollection by id
     app.get('/adopted/:id', async (req, res) => {
@@ -93,7 +136,6 @@ async function run() {
       console.log(result);
       res.send(result);
     });
-
 
     // Get all data from AvailableCollection
     app.get('/avaiable-pets', async (req, res) => {
@@ -124,6 +166,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     })
+
     // Get all data from BlogsCollection
     app.get('/bookmarks', async (req, res) => {
       const cursor = BookmarkCollection.find();
@@ -157,6 +200,19 @@ async function run() {
         console.log(id);
         const query = { _id: new ObjectId(id) };
         const result = await AvailableCollection.deleteOne(query);
+        res.send(result);
+      } catch (error) {
+        console.error('Error deleting the task:', error);
+        res.status(500).send({ error: 'Internal Server Error' });
+      }
+    });
+    // delete post from AdoptedCollection
+    app.delete('/adopted/:id', async (req, res) => {
+      try {
+        const id = req.params.id;
+        console.log(id);
+        const query = { _id: new ObjectId(id) };
+        const result = await AdoptedCollection.deleteOne(query);
         res.send(result);
       } catch (error) {
         console.error('Error deleting the task:', error);
@@ -221,6 +277,7 @@ async function run() {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
+
     //Increment ReactCount
     app.patch('/blogs/incReactCount/:id', async (req, res) => {
       try {
@@ -244,6 +301,7 @@ async function run() {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
+
     //Decrement ReactCount
     app.patch('/blogs/decReactCount/:id', async (req, res) => {
       try {
@@ -290,9 +348,6 @@ async function run() {
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
-
-
-
 
     // Update data in the AvailableCollection
     app.patch('/avaiable-pets/:id', async (req, res) => {
