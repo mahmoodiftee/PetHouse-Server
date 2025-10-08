@@ -8,10 +8,22 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser')
 
 //middleware
+const allowedOrigins = [
+  'http://localhost:5173',   // Vite dev server
+  'http://localhost:3000',   // serve preview / create-react-app dev
+  'https://your-firebase-frontend.web.app',  // production Firebase Hosting
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function(origin, callback) {
+    // allow requests with no origin like curl or Postman
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 
